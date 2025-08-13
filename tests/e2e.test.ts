@@ -1,19 +1,20 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { spawn, type ChildProcess } from "node:child_process";
-import { writeFileSync, unlinkSync, existsSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { mkdtemp, writeFile, rm } from "node:fs/promises";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 describe("E2E Tests with Real CodeX CLI", () => {
-  const testDir = "/tmp/mcp-codex-test";
-  const testFile = join(testDir, "test.js");
-  const serverProcess: ChildProcess | null = null;
+  let testDir: string;
+  let testFile: string;
 
   beforeAll(async () => {
-    // Create test directory and file
-    await Bun.spawn(["mkdir", "-p", testDir]).exited;
+    // Create temporary directory safely
+    testDir = await mkdtemp(join(tmpdir(), "mcp-codex-test-"));
+    testFile = join(testDir, "test.js");
 
     // Create a simple test file for analysis
-    writeFileSync(
+    await writeFile(
       testFile,
       `
 function add(a, b) {
@@ -32,14 +33,13 @@ console.log(divide(10, 0));
   });
 
   afterAll(async () => {
-    // Cleanup
-    if (serverProcess) {
-      serverProcess.kill();
+    // Clean up test directory safely
+    try {
+      await rm(testDir, { recursive: true, force: true });
+    } catch (error) {
+      // Ignore cleanup errors in tests
+      console.warn("テストクリーンアップエラー:", error);
     }
-    if (existsSync(testFile)) {
-      unlinkSync(testFile);
-    }
-    await Bun.spawn(["rm", "-rf", testDir]).exited;
   });
 
   it("should execute basic codex command successfully", async () => {
@@ -91,7 +91,7 @@ console.log(divide(10, 0));
   }, 45000);
 
   it("should handle non-existent files gracefully", async () => {
-    const nonExistentFile = "/tmp/does-not-exist.js";
+    const nonExistentFile = join(testDir, "does-not-exist.js");
     const result = await executeCodexCommand([
       "exec",
       "--skip-git-repo-check",
@@ -182,41 +182,33 @@ console.log(divide(10, 0));
 async function executeCodexCommand(args: string[]): Promise<{
   exitCode: number;
   output: string;
-  error: string;
 }> {
   return new Promise((resolve, reject) => {
     const process = spawn("codex", args, {
-      stdio: ["pipe", "pipe", "pipe"],
+      stdio: ["ignore", "pipe", "pipe"],
     });
 
-    let output = "";
-    let error = "";
+    let stdout = "";
+    let stderr = "";
 
     process.stdout?.on("data", (data) => {
-      output += data.toString();
+      stdout += data.toString();
     });
 
     process.stderr?.on("data", (data) => {
-      error += data.toString();
+      stderr += data.toString();
     });
 
     process.on("close", (code) => {
       resolve({
-        exitCode: code || 0,
-        output: output.trim(),
-        error: error.trim(),
+        exitCode: code ?? 1,
+        output: stdout || stderr,
       });
     });
 
-    process.on("error", (err) => {
-      reject(err);
+    process.on("error", (error) => {
+      reject(error);
     });
-
-    // Set a reasonable timeout
-    setTimeout(() => {
-      process.kill();
-      reject(new Error("Command timed out"));
-    }, 60000); // 60 seconds
   });
 }
 

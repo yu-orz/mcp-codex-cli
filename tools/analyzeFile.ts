@@ -15,7 +15,7 @@ interface AnalyzeFileArgs {
 export async function analyzeFileTool(
   args: AnalyzeFileArgs,
 ): Promise<CallToolResult> {
-  const { filePath, prompt, model, sandbox = false, yolo = false } = args;
+  const { filePath, prompt, model, sandbox = true, yolo = false } = args;
 
   // Check if file exists
   if (!existsSync(filePath)) {

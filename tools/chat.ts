@@ -10,7 +10,7 @@ interface ChatArgs {
 }
 
 export async function chatTool(args: ChatArgs): Promise<CallToolResult> {
-  const { prompt, model, sandbox = false, yolo = false } = args;
+  const { prompt, model, sandbox = true, yolo = false } = args;
 
   try {
     const codexArgs = [CODEX_EXEC_SUBCOMMAND, SKIP_GIT_REPO_CHECK_FLAG];
