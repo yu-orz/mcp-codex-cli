@@ -3,10 +3,16 @@ import { spawn } from "node:child_process";
 export async function executeCommand(command: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
     const process = spawn(command, args, { 
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe']
     });
     let stdout = "";
     let stderr = "";
+
+    // 120秒のタイムアウトを設定
+    const timeout = setTimeout(() => {
+      process.kill();
+      reject(new Error(`Command ${command} timed out after 120 seconds`));
+    }, 120000);
 
     process.stdout?.on("data", (data) => {
       stdout += data.toString();
@@ -17,6 +23,7 @@ export async function executeCommand(command: string, args: string[]): Promise<{
     });
 
     process.on("close", (code) => {
+      clearTimeout(timeout);
       if (code === 0 || stdout) {
         resolve({ stdout, stderr });
       } else {
@@ -25,6 +32,7 @@ export async function executeCommand(command: string, args: string[]): Promise<{
     });
 
     process.on("error", (error) => {
+      clearTimeout(timeout);
       reject(error);
     });
   });

@@ -27,7 +27,7 @@ export async function analyzeFileTool(args: AnalyzeFileArgs): Promise<CallToolRe
   }
 
   try {
-    const codexArgs = ["--skip-git-repo-check"];
+    const codexArgs = ["exec"];
     
     if (model) {
       codexArgs.push("--model", model);

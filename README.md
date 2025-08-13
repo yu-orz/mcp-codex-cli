@@ -67,17 +67,10 @@ cd mcp-codex-cli
 bun install
 ```
 
-2. Claude Codeの設定ファイルに追加：
+2. Claude Codeに追加：
 
-```json
-{
-  "mcpServers": {
-    "mcp-codex-cli": {
-      "command": "bun",
-      "args": ["run", "/path/to/mcp-codex-cli/index.ts"]
-    }
-  }
-}
+```bash
+claude mcp add mcp-codex-cli bun run /path/to/mcp-codex-cli/index.ts
 ```
 
 ## 使用方法

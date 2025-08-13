@@ -40,7 +40,7 @@ bun run format
 
 ### CodeX CLI Integration
 
-Both tools execute `codex` commands with the `--skip-git-repo-check` flag to allow operation outside Git repositories. Key flag mappings:
+Both tools execute `codex` commands directly. Key flag mappings:
 
 - `sandbox: true` → `--sandbox workspace-write`
 - `yolo: true` → `--full-auto`
@@ -59,7 +59,7 @@ The tools use `spawn()` to execute CodeX CLI commands and return stdout/stderr a
 ### CodeX CLI Requirements
 
 - Must have OpenAI CodeX CLI installed and accessible in PATH
-- Uses `--skip-git-repo-check` flag in all commands to bypass Git repository requirements
+- Executes commands directly without additional flags
 - Commands are executed via `child_process.spawn()` with `shell: true`
 
 ### MCP Tool Schemas

@@ -12,7 +12,7 @@ export async function chatTool(args: ChatArgs): Promise<CallToolResult> {
   const { prompt, model, sandbox = false, yolo = false } = args;
 
   try {
-    const codexArgs = ["--skip-git-repo-check"];
+    const codexArgs = ["exec"];
     
     if (model) {
       codexArgs.push("--model", model);
