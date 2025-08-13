@@ -41,6 +41,8 @@ describe("chatTool Integration Tests", () => {
       model?: string;
       sandbox?: boolean;
       yolo?: boolean;
+      reasoningEffort?: "none" | "low" | "medium" | "high";
+      reasoningSummary?: "none" | "auto";
     }) {
       const args: string[] = [];
 
@@ -54,6 +56,14 @@ describe("chatTool Integration Tests", () => {
 
       if (options.yolo) {
         args.push("--full-auto");
+      }
+
+      if (options.reasoningEffort && options.reasoningEffort !== "medium") {
+        args.push("-c", `model_reasoning_effort=${options.reasoningEffort}`);
+      }
+
+      if (options.reasoningSummary && options.reasoningSummary !== "none") {
+        args.push("-c", `model_reasoning_summary=${options.reasoningSummary}`);
       }
 
       args.push(options.prompt);
@@ -98,6 +108,29 @@ describe("chatTool Integration Tests", () => {
       "--full-auto",
       "Complex test",
     ]);
+
+    // Test reasoning options
+    expect(
+      buildCodexArgs({
+        prompt: "Test with reasoning",
+        reasoningEffort: "high",
+        reasoningSummary: "auto",
+      }),
+    ).toEqual([
+      "-c",
+      "model_reasoning_effort=high",
+      "-c", 
+      "model_reasoning_summary=auto",
+      "Test with reasoning",
+    ]);
+
+    expect(
+      buildCodexArgs({
+        prompt: "Test with default reasoning",
+        reasoningEffort: "medium",  // Should not appear in args
+        reasoningSummary: "none",   // Should not appear in args
+      }),
+    ).toEqual(["Test with default reasoning"]);
   });
 
   it("should validate spawn options structure", () => {

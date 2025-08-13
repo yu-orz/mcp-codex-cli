@@ -43,14 +43,21 @@ console.log(divide(10, 0));
   });
 
   it("should execute basic codex command successfully", async () => {
+    console.log("🧪 テスト開始: 基本的なCodeXコマンド実行");
+    
     const result = await executeCodexCommand([
       "exec",
       "--skip-git-repo-check",
       "What is 2+2? Give me just the number.",
     ]);
 
+    console.log(`🔍 結果: 終了コード=${result.exitCode}, 出力長=${result.output.length}`);
+    console.log(`📝 出力内容: ${result.output.substring(0, 500)}...`);
+
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain("4");
+    
+    console.log("✅ テスト成功: 基本的なCodeXコマンド実行");
   }, 30000); // 30 second timeout
 
   it("should handle model parameter", async () => {
@@ -176,6 +183,40 @@ console.log(divide(10, 0));
       `Check for bugs. Please analyze the file: ${testFile}`,
     ]);
   });
+
+  it("should validate reasoning options in command construction", () => {
+    const chatArgs = buildChatArgs({
+      prompt: "Test reasoning",
+      reasoningEffort: "high",
+      reasoningSummary: "auto",
+    });
+
+    expect(chatArgs).toEqual([
+      "exec",
+      "--skip-git-repo-check",
+      "-c",
+      "model_reasoning_effort=high",
+      "-c",
+      "model_reasoning_summary=auto",
+      "Test reasoning",
+    ]);
+
+    const analyzeArgs = buildAnalyzeFileArgs({
+      filePath: testFile,
+      reasoningEffort: "low",
+      reasoningSummary: "auto",
+    });
+
+    expect(analyzeArgs).toEqual([
+      "exec",
+      "--skip-git-repo-check",
+      "-c",
+      "model_reasoning_effort=low",
+      "-c",
+      "model_reasoning_summary=auto",
+      `Please analyze this file: ${testFile}`,
+    ]);
+  });
 });
 
 // Helper functions
@@ -183,7 +224,10 @@ async function executeCodexCommand(args: string[]): Promise<{
   exitCode: number;
   output: string;
 }> {
+  console.log(`🔧 実行中: codex ${args.join(' ')}`);
+  
   return new Promise((resolve, reject) => {
+    const startTime = Date.now();
     const process = spawn("codex", args, {
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -192,14 +236,23 @@ async function executeCodexCommand(args: string[]): Promise<{
     let stderr = "";
 
     process.stdout?.on("data", (data) => {
-      stdout += data.toString();
+      const chunk = data.toString();
+      stdout += chunk;
+      console.log(`📤 STDOUT: ${chunk.trim()}`);
     });
 
     process.stderr?.on("data", (data) => {
-      stderr += data.toString();
+      const chunk = data.toString();
+      stderr += chunk;
+      console.log(`📤 STDERR: ${chunk.trim()}`);
     });
 
     process.on("close", (code) => {
+      const duration = Date.now() - startTime;
+      console.log(`✅ コマンド終了: 終了コード=${code}, 実行時間=${duration}ms`);
+      console.log(`📋 STDOUT合計: ${stdout.length}文字`);
+      console.log(`📋 STDERR合計: ${stderr.length}文字`);
+      
       resolve({
         exitCode: code ?? 1,
         output: stdout || stderr,
@@ -207,6 +260,8 @@ async function executeCodexCommand(args: string[]): Promise<{
     });
 
     process.on("error", (error) => {
+      const duration = Date.now() - startTime;
+      console.log(`❌ プロセスエラー: ${error.message}, 実行時間=${duration}ms`);
       reject(error);
     });
   });
@@ -217,6 +272,8 @@ function buildChatArgs(options: {
   model?: string;
   sandbox?: boolean;
   yolo?: boolean;
+  reasoningEffort?: "none" | "low" | "medium" | "high";
+  reasoningSummary?: "none" | "auto";
 }): string[] {
   const args = ["exec", "--skip-git-repo-check"];
 
@@ -230,6 +287,14 @@ function buildChatArgs(options: {
 
   if (options.yolo) {
     args.push("--full-auto");
+  }
+
+  if (options.reasoningEffort && options.reasoningEffort !== "medium") {
+    args.push("-c", `model_reasoning_effort=${options.reasoningEffort}`);
+  }
+
+  if (options.reasoningSummary && options.reasoningSummary !== "none") {
+    args.push("-c", `model_reasoning_summary=${options.reasoningSummary}`);
   }
 
   args.push(options.prompt);
@@ -242,6 +307,8 @@ function buildAnalyzeFileArgs(options: {
   model?: string;
   sandbox?: boolean;
   yolo?: boolean;
+  reasoningEffort?: "none" | "low" | "medium" | "high";
+  reasoningSummary?: "none" | "auto";
 }): string[] {
   const args = ["exec", "--skip-git-repo-check"];
 
@@ -255,6 +322,14 @@ function buildAnalyzeFileArgs(options: {
 
   if (options.yolo) {
     args.push("--full-auto");
+  }
+
+  if (options.reasoningEffort && options.reasoningEffort !== "medium") {
+    args.push("-c", `model_reasoning_effort=${options.reasoningEffort}`);
+  }
+
+  if (options.reasoningSummary && options.reasoningSummary !== "none") {
+    args.push("-c", `model_reasoning_summary=${options.reasoningSummary}`);
   }
 
   const analysisPrompt = options.prompt

@@ -71,6 +71,8 @@ CodeXにモデルgpt-5、サンドボックスモードで「このコードを�
 | `model` | string | ❌ | `gpt-5` | 使用モデル |
 | `sandbox` | boolean | ❌ | `true` | サンドボックスモード |
 | `yolo` | boolean | ❌ | `false` | 全自動モード |
+| `reasoningEffort` | string | ❌ | `medium` | 推論レベル (`none`\|`low`\|`medium`\|`high`) |
+| `reasoningSummary` | string | ❌ | `none` | 推論要約 (`none`\|`auto`) |
 
 ### Analyze File Tool
 
@@ -81,11 +83,21 @@ CodeXにモデルgpt-5、サンドボックスモードで「このコードを�
 | `model` | string | ❌ | `gpt-5` | 使用モデル |
 | `sandbox` | boolean | ❌ | `true` | サンドボックスモード |
 | `yolo` | boolean | ❌ | `false` | 全自動モード |
+| `reasoningEffort` | string | ❌ | `medium` | 推論レベル (`none`\|`low`\|`medium`\|`high`) |
+| `reasoningSummary` | string | ❌ | `none` | 推論要約 (`none`\|`auto`) |
 
 ### オプション説明
 
 - **sandbox**: `true` → `--sandbox workspace-write` (ワークスペース内のみ安全に実行)
 - **yolo**: `true` → `--full-auto` (確認なしで自動実行、**注意して使用**)
+- **reasoningEffort**: 推論レベルを制御 → `-c model_reasoning_effort=値`
+  - `none`: 推論なし（最速）
+  - `low`: 軽微な推論
+  - `medium`: 標準推論（デフォルト）
+  - `high`: 詳細な推論（最も時間がかかる）
+- **reasoningSummary**: 推論要約の表示制御 → `-c model_reasoning_summary=値`
+  - `none`: 推論要約なし（デフォルト）
+  - `auto`: 自動で推論要約を表示
 
 ## 実行されるコマンド
 
@@ -93,10 +105,23 @@ CodeXにモデルgpt-5、サンドボックスモードで「このコードを�
 
 ```bash
 # Chat Tool
-codex exec --skip-git-repo-check [--model gpt-5] [--sandbox workspace-write] [--full-auto] "プロンプト"
+codex exec --skip-git-repo-check [--model gpt-5] [--sandbox workspace-write] [--full-auto] [-c model_reasoning_effort=値] [-c model_reasoning_summary=値] "プロンプト"
 
 # Analyze File Tool
-codex exec --skip-git-repo-check [オプション] "カスタムプロンプト. Please analyze the file: ファイルパス"
+codex exec --skip-git-repo-check [オプション] [-c model_reasoning_effort=値] [-c model_reasoning_summary=値] "カスタムプロンプト. Please analyze the file: ファイルパス"
+```
+
+### 実行例
+
+```bash
+# 基本的なチャット
+codex exec --skip-git-repo-check --sandbox workspace-write "Hello CodeX"
+
+# 高精度推論付きチャット
+codex exec --skip-git-repo-check --sandbox workspace-write -c model_reasoning_effort=high -c model_reasoning_summary=auto "複雑な問題を解決して"
+
+# 高速チャット（推論なし）
+codex exec --skip-git-repo-check --sandbox workspace-write -c model_reasoning_effort=none "簡単な質問"
 ```
 
 ## 開発

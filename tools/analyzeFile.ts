@@ -10,12 +10,14 @@ interface AnalyzeFileArgs {
   model?: string;
   sandbox?: boolean;
   yolo?: boolean;
+  reasoningEffort?: "none" | "low" | "medium" | "high";
+  reasoningSummary?: "none" | "auto";
 }
 
 export async function analyzeFileTool(
   args: AnalyzeFileArgs,
 ): Promise<CallToolResult> {
-  const { filePath, prompt, model, sandbox = true, yolo = false } = args;
+  const { filePath, prompt, model, sandbox = true, yolo = false, reasoningEffort = "medium", reasoningSummary = "none" } = args;
 
   // Check if file exists
   if (!existsSync(filePath)) {
@@ -42,6 +44,14 @@ export async function analyzeFileTool(
 
     if (yolo) {
       codexArgs.push("--full-auto");
+    }
+
+    if (reasoningEffort !== "medium") {
+      codexArgs.push("-c", `model_reasoning_effort=${reasoningEffort}`);
+    }
+
+    if (reasoningSummary !== "none") {
+      codexArgs.push("-c", `model_reasoning_summary=${reasoningSummary}`);
     }
 
     // Build the prompt with file analysis request
