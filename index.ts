@@ -47,6 +47,16 @@ const tools: Tool[] = [
           type: "boolean",
           description: "Automatically accept all actions (optional)",
         },
+        reasoningEffort: {
+          type: "string",
+          description: "Model reasoning effort level (optional, default: medium)",
+          enum: ["none", "low", "medium", "high"],
+        },
+        reasoningSummary: {
+          type: "string",
+          description: "Model reasoning summary mode (optional, default: none)",
+          enum: ["none", "auto"],
+        },
       },
       required: ["prompt"],
     },
@@ -76,6 +86,16 @@ const tools: Tool[] = [
         yolo: {
           type: "boolean",
           description: "Automatically accept all actions (optional)",
+        },
+        reasoningEffort: {
+          type: "string",
+          description: "Model reasoning effort level (optional, default: medium)",
+          enum: ["none", "low", "medium", "high"],
+        },
+        reasoningSummary: {
+          type: "string",
+          description: "Model reasoning summary mode (optional, default: none)",
+          enum: ["none", "auto"],
         },
       },
       required: ["filePath"],

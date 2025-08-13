@@ -50,6 +50,8 @@ describe("analyzeFileTool Integration Tests", () => {
       model?: string;
       sandbox?: boolean;
       yolo?: boolean;
+      reasoningEffort?: "none" | "low" | "medium" | "high";
+      reasoningSummary?: "none" | "auto";
     }) {
       const args: string[] = [];
 
@@ -63,6 +65,14 @@ describe("analyzeFileTool Integration Tests", () => {
 
       if (options.yolo) {
         args.push("--full-auto");
+      }
+
+      if (options.reasoningEffort && options.reasoningEffort !== "medium") {
+        args.push("-c", `model_reasoning_effort=${options.reasoningEffort}`);
+      }
+
+      if (options.reasoningSummary && options.reasoningSummary !== "none") {
+        args.push("-c", `model_reasoning_summary=${options.reasoningSummary}`);
       }
 
       // Build the analysis prompt
@@ -117,6 +127,30 @@ describe("analyzeFileTool Integration Tests", () => {
       "--full-auto",
       "Review code quality. Please analyze the file: /resolved/app.js",
     ]);
+
+    // Test reasoning options
+    expect(
+      buildCodexArgsForFile({
+        filePath: "/resolved/test.ts",
+        reasoningEffort: "high",
+        reasoningSummary: "auto",
+      }),
+    ).toEqual([
+      "-c",
+      "model_reasoning_effort=high",
+      "-c",
+      "model_reasoning_summary=auto",
+      "Please analyze this file: /resolved/test.ts",
+    ]);
+
+    // Test default reasoning options (should not appear in args)
+    expect(
+      buildCodexArgsForFile({
+        filePath: "/resolved/test.ts",
+        reasoningEffort: "medium",
+        reasoningSummary: "none",
+      }),
+    ).toEqual(["Please analyze this file: /resolved/test.ts"]);
   });
 
   it("should validate file existence check logic", () => {
