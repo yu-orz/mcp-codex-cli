@@ -42,7 +42,6 @@ console.log(divide(10, 0));
   it("should execute basic codex command successfully", async () => {
     const result = await executeCodexCommand([
       "exec", 
-      "--skip-git-repo-check",
       "What is 2+2? Give me just the number."
     ]);
     
@@ -53,7 +52,6 @@ console.log(divide(10, 0));
   it("should handle model parameter", async () => {
     const result = await executeCodexCommand([
       "exec",
-      "--skip-git-repo-check",
       "--model", "gpt-5",
       "Say 'Hello from gpt-5' exactly"
     ]);
@@ -65,7 +63,6 @@ console.log(divide(10, 0));
   it("should work with sandbox mode", async () => {
     const result = await executeCodexCommand([
       "exec",
-      "--skip-git-repo-check",
       "--sandbox", "read-only",
       "What is the current date? Don't execute any commands, just tell me what command I could use."
     ]);
@@ -77,7 +74,6 @@ console.log(divide(10, 0));
   it("should analyze a file when it exists", async () => {
     const result = await executeCodexCommand([
       "exec",
-      "--skip-git-repo-check",
       `Analyze this JavaScript file for potential issues: ${testFile}. Focus on the divide function.`
     ]);
     
@@ -89,7 +85,6 @@ console.log(divide(10, 0));
     const nonExistentFile = "/tmp/does-not-exist.js";
     const result = await executeCodexCommand([
       "exec",
-      "--skip-git-repo-check",
       `Please analyze this file: ${nonExistentFile}`
     ]);
     
@@ -103,7 +98,6 @@ console.log(divide(10, 0));
   it("should work with multiple parameters combined", async () => {
     const result = await executeCodexCommand([
       "exec",
-      "--skip-git-repo-check",
       "--model", "gpt-5",
       "--sandbox", "read-only",
       "Explain what this command does: ls -la"
@@ -138,7 +132,6 @@ console.log(divide(10, 0));
     
     expect(args).toEqual([
       "exec",
-      "--skip-git-repo-check",
       "--model", "gpt-5",
       "--sandbox", "workspace-write",
       "Hello CodeX"
@@ -156,7 +149,6 @@ console.log(divide(10, 0));
     
     expect(args).toEqual([
       "exec",
-      "--skip-git-repo-check",
       "--model", "gpt-5",
       "--sandbox", "workspace-write",
       "--full-auto",
@@ -213,7 +205,7 @@ function buildChatArgs(options: {
   sandbox?: boolean;
   yolo?: boolean;
 }): string[] {
-  const args = ["exec", "--skip-git-repo-check"];
+  const args = ["exec"];
   
   if (options.model) {
     args.push("--model", options.model);
@@ -238,7 +230,7 @@ function buildAnalyzeFileArgs(options: {
   sandbox?: boolean;
   yolo?: boolean;
 }): string[] {
-  const args = ["exec", "--skip-git-repo-check"];
+  const args = ["exec"];
   
   if (options.model) {
     args.push("--model", options.model);
