@@ -1,18 +1,26 @@
 import { spawn } from "node:child_process";
+import { DEFAULT_COMMAND_TIMEOUT_MS } from "../constants.ts";
 
-export async function executeCommand(command: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
+export async function executeCommand(
+  command: string,
+  args: string[],
+): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const process = spawn(command, args, { 
-      stdio: ['ignore', 'pipe', 'pipe']
+    const process = spawn(command, args, {
+      stdio: ["ignore", "pipe", "pipe"],
     });
     let stdout = "";
     let stderr = "";
 
-    // 120秒のタイムアウトを設定
+    // タイムアウトを設定
     const timeout = setTimeout(() => {
       process.kill();
-      reject(new Error(`Command ${command} timed out after 120 seconds`));
-    }, 120000);
+      reject(
+        new Error(
+          `Command ${command} timed out after ${DEFAULT_COMMAND_TIMEOUT_MS / 1000} seconds`,
+        ),
+      );
+    }, DEFAULT_COMMAND_TIMEOUT_MS);
 
     process.stdout?.on("data", (data) => {
       stdout += data.toString();
@@ -24,10 +32,12 @@ export async function executeCommand(command: string, args: string[]): Promise<{
 
     process.on("close", (code) => {
       clearTimeout(timeout);
-      if (code === 0 || stdout) {
+      if (code === 0) {
         resolve({ stdout, stderr });
       } else {
-        reject(new Error(`Command ${command} exited with code ${code}: ${stderr}`));
+        reject(
+          new Error(`Command ${command} exited with code ${code}: ${stderr}`),
+        );
       }
     });
 

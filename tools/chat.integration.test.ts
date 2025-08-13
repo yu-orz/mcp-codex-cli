@@ -8,21 +8,29 @@ describe("chatTool Integration Tests", () => {
     const withSandboxArgs = ["--sandbox", "workspace-write", "Test prompt"];
     const withYoloArgs = ["--full-auto", "Test prompt"];
     const combinedArgs = [
-      "--model", "gpt-5", 
-      "--sandbox", "workspace-write", 
-      "--full-auto", 
-      "Complex prompt"
+      "--model",
+      "gpt-5",
+      "--sandbox",
+      "workspace-write",
+      "--full-auto",
+      "Complex prompt",
     ];
 
     expect(basicArgs).toEqual(["Hello, CodeX!"]);
     expect(withModelArgs).toEqual(["--model", "gpt-5", "Test prompt"]);
-    expect(withSandboxArgs).toEqual(["--sandbox", "workspace-write", "Test prompt"]);
+    expect(withSandboxArgs).toEqual([
+      "--sandbox",
+      "workspace-write",
+      "Test prompt",
+    ]);
     expect(withYoloArgs).toEqual(["--full-auto", "Test prompt"]);
     expect(combinedArgs).toEqual([
-      "--model", "gpt-5", 
-      "--sandbox", "workspace-write", 
-      "--full-auto", 
-      "Complex prompt"
+      "--model",
+      "gpt-5",
+      "--sandbox",
+      "workspace-write",
+      "--full-auto",
+      "Complex prompt",
     ]);
   });
 
@@ -35,61 +43,69 @@ describe("chatTool Integration Tests", () => {
       yolo?: boolean;
     }) {
       const args: string[] = [];
-      
+
       if (options.model) {
         args.push("--model", options.model);
       }
-      
+
       if (options.sandbox) {
         args.push("--sandbox", "workspace-write");
       }
-      
+
       if (options.yolo) {
         args.push("--full-auto");
       }
 
       args.push(options.prompt);
-      
+
       return args;
     }
 
     expect(buildCodexArgs({ prompt: "Hello" })).toEqual(["Hello"]);
-    expect(buildCodexArgs({ 
-      prompt: "Test", 
-      model: "gpt-5" 
-    })).toEqual(["--model", "gpt-5", "Test"]);
-    
-    expect(buildCodexArgs({ 
-      prompt: "Test", 
-      sandbox: true 
-    })).toEqual(["--sandbox", "workspace-write", "Test"]);
-    
-    expect(buildCodexArgs({ 
-      prompt: "Test", 
-      yolo: true 
-    })).toEqual(["--full-auto", "Test"]);
-    
-    expect(buildCodexArgs({ 
-      prompt: "Complex test",
-      model: "gpt-5",
-      sandbox: true,
-      yolo: true
-    })).toEqual([
-      "--model", "gpt-5",
-      "--sandbox", "workspace-write", 
+    expect(
+      buildCodexArgs({
+        prompt: "Test",
+        model: "gpt-5",
+      }),
+    ).toEqual(["--model", "gpt-5", "Test"]);
+
+    expect(
+      buildCodexArgs({
+        prompt: "Test",
+        sandbox: true,
+      }),
+    ).toEqual(["--sandbox", "workspace-write", "Test"]);
+
+    expect(
+      buildCodexArgs({
+        prompt: "Test",
+        yolo: true,
+      }),
+    ).toEqual(["--full-auto", "Test"]);
+
+    expect(
+      buildCodexArgs({
+        prompt: "Complex test",
+        model: "gpt-5",
+        sandbox: true,
+        yolo: true,
+      }),
+    ).toEqual([
+      "--model",
+      "gpt-5",
+      "--sandbox",
+      "workspace-write",
       "--full-auto",
-      "Complex test"
+      "Complex test",
     ]);
   });
 
   it("should validate spawn options structure", () => {
     const expectedSpawnOptions = {
-      stdio: ["pipe", "pipe", "pipe"],
-      shell: true,
+      stdio: ["ignore", "pipe", "pipe"],
     };
 
-    expect(expectedSpawnOptions.stdio).toEqual(["pipe", "pipe", "pipe"]);
-    expect(expectedSpawnOptions.shell).toBe(true);
+    expect(expectedSpawnOptions.stdio).toEqual(["ignore", "pipe", "pipe"]);
   });
 
   it("should validate codex command name", () => {
@@ -102,9 +118,9 @@ describe("chatTool Integration Tests", () => {
       content: [
         {
           type: "text",
-          text: "CodeX response"
-        }
-      ]
+          text: "CodeX response",
+        },
+      ],
     };
 
     expect(mockResponse.content).toHaveLength(1);
@@ -117,13 +133,15 @@ describe("chatTool Integration Tests", () => {
       content: [
         {
           type: "text",
-          text: "Error executing CodeX CLI: Command failed"
-        }
-      ]
+          text: "Error executing CodeX CLI: Command failed",
+        },
+      ],
     };
 
     expect(errorResponse.content).toHaveLength(1);
     expect(errorResponse.content[0].type).toBe("text");
-    expect(errorResponse.content[0].text).toContain("Error executing CodeX CLI");
+    expect(errorResponse.content[0].text).toContain(
+      "Error executing CodeX CLI",
+    );
   });
 });

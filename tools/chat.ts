@@ -1,5 +1,6 @@
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { executeCommand } from "../utils/executeCommand.ts";
+import { CODEX_EXEC_SUBCOMMAND, SKIP_GIT_REPO_CHECK_FLAG } from "../constants.ts";
 
 interface ChatArgs {
   prompt: string;
@@ -12,16 +13,16 @@ export async function chatTool(args: ChatArgs): Promise<CallToolResult> {
   const { prompt, model, sandbox = false, yolo = false } = args;
 
   try {
-    const codexArgs = ["exec"];
-    
+    const codexArgs = [CODEX_EXEC_SUBCOMMAND, SKIP_GIT_REPO_CHECK_FLAG];
+
     if (model) {
       codexArgs.push("--model", model);
     }
-    
+
     if (sandbox) {
       codexArgs.push("--sandbox", "workspace-write");
     }
-    
+
     if (yolo) {
       codexArgs.push("--full-auto");
     }
@@ -29,7 +30,7 @@ export async function chatTool(args: ChatArgs): Promise<CallToolResult> {
     codexArgs.push(prompt);
 
     const result = await executeCommand("codex", codexArgs);
-    
+
     return {
       content: [
         {
@@ -49,4 +50,3 @@ export async function chatTool(args: ChatArgs): Promise<CallToolResult> {
     };
   }
 }
-

@@ -15,11 +15,21 @@ mock.module("./tools/analyzeFile.ts", () => ({
 // Mock commander
 mock.module("commander", () => ({
   Command: class {
-    name() { return this; }
-    description() { return this; }
-    version() { return this; }
-    option() { return this; }
-    parse() { return this; }
+    name() {
+      return this;
+    }
+    description() {
+      return this;
+    }
+    version() {
+      return this;
+    }
+    option() {
+      return this;
+    }
+    parse() {
+      return this;
+    }
   },
 }));
 
@@ -40,7 +50,7 @@ describe("MCP Server", () => {
   it("should create server with correct configuration", () => {
     // Import after mocking
     const serverModule = require("./index.ts");
-    
+
     // The server should be created (this is mainly a smoke test)
     expect(serverModule).toBeDefined();
   });
@@ -48,7 +58,7 @@ describe("MCP Server", () => {
   it("should handle chat tool calls", async () => {
     // Import the module to access the server configuration
     const _serverModule = require("./index.ts");
-    
+
     // This test verifies that the tools are properly imported and mocked
     expect(mockChatTool).toBeDefined();
     expect(mockAnalyzeFileTool).toBeDefined();
@@ -63,7 +73,7 @@ describe("MCP Server", () => {
         description: "Engage in a chat conversation with CodeX CLI",
       },
       {
-        name: "analyzeFile", 
+        name: "analyzeFile",
         description: "Analyze a file using CodeX CLI",
       },
     ];

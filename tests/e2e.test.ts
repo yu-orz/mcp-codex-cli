@@ -6,14 +6,16 @@ import { join } from "node:path";
 describe("E2E Tests with Real CodeX CLI", () => {
   const testDir = "/tmp/mcp-codex-test";
   const testFile = join(testDir, "test.js");
-  let serverProcess: ChildProcess | null = null;
+  const serverProcess: ChildProcess | null = null;
 
   beforeAll(async () => {
     // Create test directory and file
     await Bun.spawn(["mkdir", "-p", testDir]).exited;
-    
+
     // Create a simple test file for analysis
-    writeFileSync(testFile, `
+    writeFileSync(
+      testFile,
+      `
 function add(a, b) {
   return a + b;
 }
@@ -25,7 +27,8 @@ function divide(a, b) {
 
 console.log(add(1, 2));
 console.log(divide(10, 0));
-`);
+`,
+    );
   });
 
   afterAll(async () => {
@@ -41,10 +44,11 @@ console.log(divide(10, 0));
 
   it("should execute basic codex command successfully", async () => {
     const result = await executeCodexCommand([
-      "exec", 
-      "What is 2+2? Give me just the number."
+      "exec",
+      "--skip-git-repo-check",
+      "What is 2+2? Give me just the number.",
     ]);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain("4");
   }, 30000); // 30 second timeout
@@ -52,10 +56,12 @@ console.log(divide(10, 0));
   it("should handle model parameter", async () => {
     const result = await executeCodexCommand([
       "exec",
-      "--model", "gpt-5",
-      "Say 'Hello from gpt-5' exactly"
+      "--skip-git-repo-check",
+      "--model",
+      "gpt-5",
+      "Say 'Hello from gpt-5' exactly",
     ]);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.output.length).toBeGreaterThan(0);
   }, 30000);
@@ -63,10 +69,12 @@ console.log(divide(10, 0));
   it("should work with sandbox mode", async () => {
     const result = await executeCodexCommand([
       "exec",
-      "--sandbox", "read-only",
-      "What is the current date? Don't execute any commands, just tell me what command I could use."
+      "--skip-git-repo-check",
+      "--sandbox",
+      "read-only",
+      "What is the current date? Don't execute any commands, just tell me what command I could use.",
     ]);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.output.length).toBeGreaterThan(0);
   }, 30000);
@@ -74,9 +82,10 @@ console.log(divide(10, 0));
   it("should analyze a file when it exists", async () => {
     const result = await executeCodexCommand([
       "exec",
-      `Analyze this JavaScript file for potential issues: ${testFile}. Focus on the divide function.`
+      "--skip-git-repo-check",
+      `Analyze this JavaScript file for potential issues: ${testFile}. Focus on the divide function.`,
     ]);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.output.toLowerCase()).toMatch(/division|divide|zero/);
   }, 45000);
@@ -85,31 +94,37 @@ console.log(divide(10, 0));
     const nonExistentFile = "/tmp/does-not-exist.js";
     const result = await executeCodexCommand([
       "exec",
-      `Please analyze this file: ${nonExistentFile}`
+      "--skip-git-repo-check",
+      `Please analyze this file: ${nonExistentFile}`,
     ]);
-    
+
     // CodeX should either succeed with an explanation or fail gracefully
     expect([0, 1]).toContain(result.exitCode);
     if (result.exitCode !== 0) {
-      expect(result.output.toLowerCase()).toMatch(/not found|does not exist|cannot|error/);
+      expect(result.output.toLowerCase()).toMatch(
+        /not found|does not exist|cannot|error/,
+      );
     }
   }, 30000);
 
   it("should work with multiple parameters combined", async () => {
     const result = await executeCodexCommand([
       "exec",
-      "--model", "gpt-5",
-      "--sandbox", "read-only",
-      "Explain what this command does: ls -la"
+      "--skip-git-repo-check",
+      "--model",
+      "gpt-5",
+      "--sandbox",
+      "read-only",
+      "Explain what this command does: ls -la",
     ]);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.output.toLowerCase()).toMatch(/list|directory|files/);
   }, 30000);
 
   it("should handle help command", async () => {
     const result = await executeCodexCommand(["--help"]);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain("Codex CLI");
     expect(result.output).toContain("Usage:");
@@ -117,7 +132,7 @@ console.log(divide(10, 0));
 
   it("should handle version command", async () => {
     const result = await executeCodexCommand(["--version"]);
-    
+
     expect(result.exitCode).toBe(0);
     expect(result.output).toMatch(/\d+\.\d+\.\d+/); // Version number pattern
   }, 10000);
@@ -129,12 +144,15 @@ console.log(divide(10, 0));
       model: "gpt-5",
       sandbox: true,
     });
-    
+
     expect(args).toEqual([
       "exec",
-      "--model", "gpt-5",
-      "--sandbox", "workspace-write",
-      "Hello CodeX"
+      "--skip-git-repo-check",
+      "--model",
+      "gpt-5",
+      "--sandbox",
+      "workspace-write",
+      "Hello CodeX",
     ]);
   });
 
@@ -146,13 +164,16 @@ console.log(divide(10, 0));
       sandbox: true,
       yolo: true,
     });
-    
+
     expect(args).toEqual([
       "exec",
-      "--model", "gpt-5",
-      "--sandbox", "workspace-write",
+      "--skip-git-repo-check",
+      "--model",
+      "gpt-5",
+      "--sandbox",
+      "workspace-write",
       "--full-auto",
-      `Check for bugs. Please analyze the file: ${testFile}`
+      `Check for bugs. Please analyze the file: ${testFile}`,
     ]);
   });
 });
@@ -205,16 +226,16 @@ function buildChatArgs(options: {
   sandbox?: boolean;
   yolo?: boolean;
 }): string[] {
-  const args = ["exec"];
-  
+  const args = ["exec", "--skip-git-repo-check"];
+
   if (options.model) {
     args.push("--model", options.model);
   }
-  
+
   if (options.sandbox) {
     args.push("--sandbox", "workspace-write");
   }
-  
+
   if (options.yolo) {
     args.push("--full-auto");
   }
@@ -230,21 +251,21 @@ function buildAnalyzeFileArgs(options: {
   sandbox?: boolean;
   yolo?: boolean;
 }): string[] {
-  const args = ["exec"];
-  
+  const args = ["exec", "--skip-git-repo-check"];
+
   if (options.model) {
     args.push("--model", options.model);
   }
-  
+
   if (options.sandbox) {
     args.push("--sandbox", "workspace-write");
   }
-  
+
   if (options.yolo) {
     args.push("--full-auto");
   }
 
-  const analysisPrompt = options.prompt 
+  const analysisPrompt = options.prompt
     ? `${options.prompt}. Please analyze the file: ${options.filePath}`
     : `Please analyze this file: ${options.filePath}`;
 
