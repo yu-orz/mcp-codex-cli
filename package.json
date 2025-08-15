@@ -43,6 +43,7 @@
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
     "test:e2e": "bun test tests/e2e.test.ts",
+    "test:mcp": "bun test tests/mcp-integration.test.ts",
     "test:unit": "bun test tools/ index.test.ts"
   },
   "dependencies": {
