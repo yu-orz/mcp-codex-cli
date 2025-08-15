@@ -149,13 +149,13 @@ codex exec --skip-git-repo-check --sandbox workspace-write -c model_reasoning_ef
 # 開発サーバー
 bun run dev
 
-# テスト実行 (27テスト)
+# テスト実行 (24テスト)
 bun test
 
 # ユニットテストのみ (17テスト)
 bun run test:unit
 
-# E2Eテストのみ (10テスト)
+# E2Eテストのみ (7テスト、CodeX CLI必須)
 bun run test:e2e
 
 # リント
