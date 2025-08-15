@@ -14,7 +14,7 @@ import { analyzeFileTool, type AnalyzeFileArgs } from "./tools/analyzeFile.ts";
 const server = new Server(
   {
     name: "mcp-codex-cli",
-    version: "0.1.0",
+    version: "1.0.1",
   },
   {
     capabilities: {
@@ -150,7 +150,7 @@ const program = new Command();
 program
   .name("mcp-codex-cli")
   .description("MCP server for CodeX CLI")
-  .version("0.1.0")
+  .version("1.0.1")
   .option("--allow-npx", "Allow execution from NPX")
   .parse();
 
