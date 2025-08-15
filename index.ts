@@ -7,7 +7,8 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { Command } from "commander";
 import { fileURLToPath } from "node:url";
-import { resolve } from "node:path";
+import { resolve, dirname } from "node:path";
+import { realpathSync } from "node:fs";
 import { chatTool, type ChatArgs } from "./tools/chat.ts";
 import { analyzeFileTool, type AnalyzeFileArgs } from "./tools/analyzeFile.ts";
 
@@ -152,9 +153,9 @@ async function main() {
 }
 
 // Node.jsのESモジュールではimport.meta.mainは利用できないため、直接実行チェックを変更
-// npmやnpxでの実行に対応した適切な直接実行判定
-const scriptPath = fileURLToPath(import.meta.url);
-if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
+// npmやnpxでの実行（シンボリックリンク）に対応した適切な直接実行判定
+const scriptPath = realpathSync(fileURLToPath(import.meta.url));
+if (process.argv[1] && realpathSync(process.argv[1]) === scriptPath) {
   main().catch((error) => {
     console.error("Server startup error:", error);
     process.exit(1);
