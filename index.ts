@@ -7,7 +7,6 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { Command } from "commander";
 import { fileURLToPath } from "node:url";
-import { resolve, dirname } from "node:path";
 import { realpathSync } from "node:fs";
 import { chatTool, type ChatArgs } from "./tools/chat.ts";
 import { analyzeFileTool, type AnalyzeFileArgs } from "./tools/analyzeFile.ts";
@@ -117,10 +116,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case "chat":
+      case "chat": {
+        // argsが存在し、prompt プロパティを持つことを確認
+        if (!args || typeof args !== "object" || !("prompt" in args) || typeof args.prompt !== "string") {
+          throw new Error("Chat tool requires a 'prompt' parameter of type string");
+        }
         return await chatTool(args as ChatArgs);
-      case "analyzeFile":
+      }
+      case "analyzeFile": {
+        // argsが存在し、filePath プロパティを持つことを確認
+        if (!args || typeof args !== "object" || !("filePath" in args) || typeof args.filePath !== "string") {
+          throw new Error("AnalyzeFile tool requires a 'filePath' parameter of type string");
+        }
         return await analyzeFileTool(args as AnalyzeFileArgs);
+      }
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -155,7 +164,16 @@ async function main() {
 // Node.jsのESモジュールではimport.meta.mainは利用できないため、直接実行チェックを変更
 // npmやnpxでの実行（シンボリックリンク）に対応した適切な直接実行判定
 const scriptPath = realpathSync(fileURLToPath(import.meta.url));
-if (process.argv[1] && realpathSync(process.argv[1]) === scriptPath) {
+let argv1RealPath: string | undefined;
+if (process.argv[1]) {
+  try {
+    argv1RealPath = realpathSync(process.argv[1]);
+  } catch (_error) {
+    // シンボリックリンクの解決に失敗した場合は無視する
+    argv1RealPath = undefined;
+  }
+}
+if (argv1RealPath === scriptPath) {
   main().catch((error) => {
     console.error("Server startup error:", error);
     process.exit(1);
