@@ -6,8 +6,6 @@ import {
   type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { Command } from "commander";
-import { fileURLToPath } from "node:url";
-import { resolve } from "node:path";
 import { chatTool } from "./tools/chat.ts";
 import { analyzeFileTool } from "./tools/analyzeFile.ts";
 
@@ -117,9 +115,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "chat":
-        return await chatTool(args || {});
+        return await chatTool(args as any);
       case "analyzeFile":
-        return await analyzeFileTool(args || {});
+        return await analyzeFileTool(args as any);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -152,9 +150,8 @@ async function main() {
 }
 
 // Node.jsのESモジュールではimport.meta.mainは利用できないため、直接実行チェックを変更
-// パフォーマンス向上のため起動時に一度だけ計算
-const currentScriptPath = fileURLToPath(import.meta.url);
-if (process.argv[1] && resolve(process.argv[1]) === currentScriptPath) {
+// npmやnpxでの実行を考慮してシンプルな存在チェックのみ
+if (process.argv[1]) {
   main().catch((error) => {
     console.error("Server startup error:", error);
     process.exit(1);
