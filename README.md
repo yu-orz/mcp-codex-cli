@@ -24,6 +24,10 @@ codex
 ```
 
 ## インストール
+### npx
+```bash
+claude mcp add -s project mcp-codex-cli -- npx mcp-codex-cli --allow-npx
+```
 
 ```bash
 git clone https://github.com/yu-orz/mcp-codex-cli
