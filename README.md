@@ -26,7 +26,7 @@ codex
 ## インストール
 ### npx
 ```bash
-claude mcp add -s project mcp-codex-cli -- npx mcp-codex-cli --allow-npx
+claude mcp add -s project @yu-orz/mcp-codex-cli -- npx @yu-orz/mcp-codex-cli --allow-npx
 ```
 
 ```bash

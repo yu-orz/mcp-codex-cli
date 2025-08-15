@@ -9,7 +9,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "mcp-codex-cli": "dist/index.js"
+    "mcp-codex-cli": "./dist/index.js"
   },
   "files": [
     "dist"
