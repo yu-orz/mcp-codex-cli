@@ -24,15 +24,30 @@ codex
 ```
 
 ## インストール
-### npx
+
+### 方法1: npx（推奨）
+
 ```bash
-claude mcp add -s project @yu-orz/mcp-codex-cli -- npx @yu-orz/mcp-codex-cli --allow-npx
+# プロジェクト固有の設定
+claude mcp add -s project mcp-codex-cli -- npx @yu-orz/mcp-codex-cli --allow-npx
+
+# ユーザー全体の設定
+claude mcp add -s user mcp-codex-cli -- npx @yu-orz/mcp-codex-cli --allow-npx
+
+# ローカル設定
+claude mcp add -s local mcp-codex-cli -- npx @yu-orz/mcp-codex-cli --allow-npx
 ```
+
+### 方法2: ローカルビルド
 
 ```bash
 git clone https://github.com/yu-orz/mcp-codex-cli
 cd mcp-codex-cli
 bun install
+bun run build
+
+# ビルド後、Claude MCPに追加
+claude mcp add -s project mcp-codex-cli -- bun run /path/to/mcp-codex-cli/dist/index.js
 ```
 
 ## 使用方法

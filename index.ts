@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -117,9 +115,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "chat":
-        return await chatTool(args);
+        return await chatTool(args || {});
       case "analyzeFile":
-        return await analyzeFileTool(args);
+        return await analyzeFileTool(args || {});
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -151,7 +149,8 @@ async function main() {
   console.error("CodeX CLI MCP server started");
 }
 
-if (import.meta.main) {
+// Node.jsのESモジュールではimport.meta.mainは利用できないため、直接実行チェックを変更
+if (process.argv[1] === new URL(import.meta.url).pathname) {
   main().catch((error) => {
     console.error("Server startup error:", error);
     process.exit(1);
