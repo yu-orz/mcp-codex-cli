@@ -6,6 +6,7 @@ import {
   type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { Command } from "commander";
+import { fileURLToPath } from "node:url";
 import { chatTool } from "./tools/chat.ts";
 import { analyzeFileTool } from "./tools/analyzeFile.ts";
 
@@ -150,7 +151,7 @@ async function main() {
 }
 
 // Node.jsのESモジュールではimport.meta.mainは利用できないため、直接実行チェックを変更
-if (process.argv[1] === new URL(import.meta.url).pathname) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch((error) => {
     console.error("Server startup error:", error);
     process.exit(1);
