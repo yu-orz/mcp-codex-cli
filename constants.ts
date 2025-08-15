@@ -3,4 +3,4 @@ export const CODEX_EXEC_SUBCOMMAND = "exec";
 export const SKIP_GIT_REPO_CHECK_FLAG = "--skip-git-repo-check";
 
 // タイムアウト設定
-export const DEFAULT_COMMAND_TIMEOUT_MS = 300000; // 300秒
+export const DEFAULT_COMMAND_TIMEOUT_MS = 600000; // 600秒（10分）

@@ -2,7 +2,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { executeCommand } from "../utils/executeCommand.ts";
 import { CODEX_EXEC_SUBCOMMAND, SKIP_GIT_REPO_CHECK_FLAG } from "../constants.ts";
 
-interface ChatArgs {
+export interface ChatArgs {
   prompt: string;
   model?: string;
   sandbox?: boolean;
