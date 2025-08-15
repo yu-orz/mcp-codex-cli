@@ -1,5 +1,5 @@
 {
-  "name": "mcp-codex-cli",
+  "name": "@yu-orz/mcp-codex-cli",
   "version": "0.1.0",
   "description": "MCP server wrapper for OpenAI's CodeX CLI",
   "author": "Yuki",
@@ -25,7 +25,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/mcp-codex-cli"
+    "url": "git+https://github.com/yu-orz/mcp-codex-cli.git"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -34,6 +34,7 @@
     "start": "bun run index.ts",
     "dev": "bun --watch run index.ts",
     "build": "rm -rf dist && bun build --target=node --banner=$'#!/usr/bin/env node\\n' --outdir=dist --sourcemap index.ts",
+    "prepublishOnly": "bun run build && bun run test && bun run lint",
     "build:prod": "rm -rf dist && bun build --target=node --banner=$'#!/usr/bin/env node\\n' --outdir=dist --minify --sourcemap=none index.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
@@ -55,5 +56,15 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "bugs": {
+    "url": "https://github.com/yu-orz/mcp-codex-cli/issues"
+  },
+  "homepage": "https://github.com/yu-orz/mcp-codex-cli#readme",
+  "publishConfig": {
+    "access": "public"
   }
 }
