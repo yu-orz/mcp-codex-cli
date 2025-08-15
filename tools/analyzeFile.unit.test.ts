@@ -1,42 +1,66 @@
 import { describe, it, expect } from "bun:test";
 
-describe("analyzeFileTool Integration Tests", () => {
+describe("analyzeFileTool Unit Tests", () => {
   it("should validate codex command structure for file analysis", () => {
     // Test the command arguments that would be passed to codex for file analysis
-    const basicArgs = ["Please analyze this file: /resolved/test.ts"];
+    const basicArgs = ["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Please analyze this file: /resolved/test.ts"];
     const withPromptArgs = [
+      "exec",
+      "--skip-git-repo-check", 
+      "--sandbox",
+      "workspace-write",
       "Check for bugs. Please analyze the file: /resolved/test.ts",
     ];
     const withModelArgs = [
+      "exec",
+      "--skip-git-repo-check",
       "--model",
       "gpt-5",
-      "Please analyze this file: /resolved/test.ts",
-    ];
-    const withSandboxArgs = [
       "--sandbox",
       "workspace-write",
       "Please analyze this file: /resolved/test.ts",
     ];
+    const withoutSandboxArgs = [
+      "exec",
+      "--skip-git-repo-check",
+      "Please analyze this file: /resolved/test.ts",
+    ];
     const withYoloArgs = [
+      "exec",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "workspace-write",
       "--full-auto",
       "Please analyze this file: /resolved/test.ts",
     ];
 
-    expect(basicArgs).toEqual(["Please analyze this file: /resolved/test.ts"]);
+    expect(basicArgs).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Please analyze this file: /resolved/test.ts"]);
     expect(withPromptArgs).toEqual([
+      "exec",
+      "--skip-git-repo-check", 
+      "--sandbox",
+      "workspace-write",
       "Check for bugs. Please analyze the file: /resolved/test.ts",
     ]);
     expect(withModelArgs).toEqual([
+      "exec",
+      "--skip-git-repo-check",
       "--model",
       "gpt-5",
-      "Please analyze this file: /resolved/test.ts",
-    ]);
-    expect(withSandboxArgs).toEqual([
       "--sandbox",
       "workspace-write",
       "Please analyze this file: /resolved/test.ts",
     ]);
+    expect(withoutSandboxArgs).toEqual([
+      "exec",
+      "--skip-git-repo-check",
+      "Please analyze this file: /resolved/test.ts",
+    ]);
     expect(withYoloArgs).toEqual([
+      "exec",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "workspace-write",
       "--full-auto",
       "Please analyze this file: /resolved/test.ts",
     ]);
@@ -53,13 +77,13 @@ describe("analyzeFileTool Integration Tests", () => {
       reasoningEffort?: "none" | "low" | "medium" | "high";
       reasoningSummary?: "none" | "auto";
     }) {
-      const args: string[] = [];
+      const args: string[] = ["exec", "--skip-git-repo-check"];
 
       if (options.model) {
         args.push("--model", options.model);
       }
 
-      if (options.sandbox) {
+      if (options.sandbox !== false) {
         args.push("--sandbox", "workspace-write");
       }
 
@@ -75,10 +99,11 @@ describe("analyzeFileTool Integration Tests", () => {
         args.push("-c", `model_reasoning_summary=${options.reasoningSummary}`);
       }
 
-      // Build the analysis prompt
+      // Build the analysis prompt (using resolved path)
+      const resolvedPath = options.filePath.startsWith("/") ? options.filePath : `/resolved/${options.filePath}`;
       const analysisPrompt = options.prompt
-        ? `${options.prompt}. Please analyze the file: ${options.filePath}`
-        : `Please analyze this file: ${options.filePath}`;
+        ? `${options.prompt}. Please analyze the file: ${resolvedPath}`
+        : `Please analyze this file: ${resolvedPath}`;
 
       args.push(analysisPrompt);
 
@@ -89,7 +114,7 @@ describe("analyzeFileTool Integration Tests", () => {
       buildCodexArgsForFile({
         filePath: "/resolved/test.ts",
       }),
-    ).toEqual(["Please analyze this file: /resolved/test.ts"]);
+    ).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Please analyze this file: /resolved/test.ts"]);
 
     expect(
       buildCodexArgsForFile({
@@ -97,6 +122,10 @@ describe("analyzeFileTool Integration Tests", () => {
         prompt: "Check for security issues",
       }),
     ).toEqual([
+      "exec",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "workspace-write",
       "Check for security issues. Please analyze the file: /resolved/test.ts",
     ]);
 
@@ -106,8 +135,12 @@ describe("analyzeFileTool Integration Tests", () => {
         model: "gpt-5",
       }),
     ).toEqual([
+      "exec",
+      "--skip-git-repo-check",
       "--model",
       "gpt-5",
+      "--sandbox",
+      "workspace-write",
       "Please analyze this file: /resolved/test.ts",
     ]);
 
@@ -120,6 +153,8 @@ describe("analyzeFileTool Integration Tests", () => {
         yolo: true,
       }),
     ).toEqual([
+      "exec",
+      "--skip-git-repo-check",
       "--model",
       "gpt-5",
       "--sandbox",
@@ -136,6 +171,10 @@ describe("analyzeFileTool Integration Tests", () => {
         reasoningSummary: "auto",
       }),
     ).toEqual([
+      "exec",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "workspace-write",
       "-c",
       "model_reasoning_effort=high",
       "-c",
@@ -150,7 +189,7 @@ describe("analyzeFileTool Integration Tests", () => {
         reasoningEffort: "medium",
         reasoningSummary: "none",
       }),
-    ).toEqual(["Please analyze this file: /resolved/test.ts"]);
+    ).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Please analyze this file: /resolved/test.ts"]);
   });
 
   it("should validate file existence check logic", () => {

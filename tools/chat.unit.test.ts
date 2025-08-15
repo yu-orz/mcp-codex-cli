@@ -1,13 +1,15 @@
 import { describe, it, expect } from "bun:test";
 
-describe("chatTool Integration Tests", () => {
+describe("chatTool Unit Tests", () => {
   it("should validate codex command structure", () => {
     // Test the command arguments that would be passed to codex
-    const basicArgs = ["Hello, CodeX!"];
-    const withModelArgs = ["--model", "gpt-5", "Test prompt"];
-    const withSandboxArgs = ["--sandbox", "workspace-write", "Test prompt"];
-    const withYoloArgs = ["--full-auto", "Test prompt"];
+    const basicArgs = ["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Hello, CodeX!"];
+    const withModelArgs = ["exec", "--skip-git-repo-check", "--model", "gpt-5", "--sandbox", "workspace-write", "Test prompt"];
+    const withoutSandboxArgs = ["exec", "--skip-git-repo-check", "Test prompt"];
+    const withYoloArgs = ["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "--full-auto", "Test prompt"];
     const combinedArgs = [
+      "exec",
+      "--skip-git-repo-check",
       "--model",
       "gpt-5",
       "--sandbox",
@@ -16,15 +18,13 @@ describe("chatTool Integration Tests", () => {
       "Complex prompt",
     ];
 
-    expect(basicArgs).toEqual(["Hello, CodeX!"]);
-    expect(withModelArgs).toEqual(["--model", "gpt-5", "Test prompt"]);
-    expect(withSandboxArgs).toEqual([
-      "--sandbox",
-      "workspace-write",
-      "Test prompt",
-    ]);
-    expect(withYoloArgs).toEqual(["--full-auto", "Test prompt"]);
+    expect(basicArgs).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Hello, CodeX!"]);
+    expect(withModelArgs).toEqual(["exec", "--skip-git-repo-check", "--model", "gpt-5", "--sandbox", "workspace-write", "Test prompt"]);
+    expect(withoutSandboxArgs).toEqual(["exec", "--skip-git-repo-check", "Test prompt"]);
+    expect(withYoloArgs).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "--full-auto", "Test prompt"]);
     expect(combinedArgs).toEqual([
+      "exec",
+      "--skip-git-repo-check",
       "--model",
       "gpt-5",
       "--sandbox",
@@ -44,13 +44,13 @@ describe("chatTool Integration Tests", () => {
       reasoningEffort?: "none" | "low" | "medium" | "high";
       reasoningSummary?: "none" | "auto";
     }) {
-      const args: string[] = [];
+      const args: string[] = ["exec", "--skip-git-repo-check"];
 
       if (options.model) {
         args.push("--model", options.model);
       }
 
-      if (options.sandbox) {
+      if (options.sandbox !== false) {
         args.push("--sandbox", "workspace-write");
       }
 
@@ -71,27 +71,27 @@ describe("chatTool Integration Tests", () => {
       return args;
     }
 
-    expect(buildCodexArgs({ prompt: "Hello" })).toEqual(["Hello"]);
+    expect(buildCodexArgs({ prompt: "Hello" })).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Hello"]);
     expect(
       buildCodexArgs({
         prompt: "Test",
         model: "gpt-5",
       }),
-    ).toEqual(["--model", "gpt-5", "Test"]);
+    ).toEqual(["exec", "--skip-git-repo-check", "--model", "gpt-5", "--sandbox", "workspace-write", "Test"]);
 
     expect(
       buildCodexArgs({
         prompt: "Test",
-        sandbox: true,
+        sandbox: false,
       }),
-    ).toEqual(["--sandbox", "workspace-write", "Test"]);
+    ).toEqual(["exec", "--skip-git-repo-check", "Test"]);
 
     expect(
       buildCodexArgs({
         prompt: "Test",
         yolo: true,
       }),
-    ).toEqual(["--full-auto", "Test"]);
+    ).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "--full-auto", "Test"]);
 
     expect(
       buildCodexArgs({
@@ -101,6 +101,8 @@ describe("chatTool Integration Tests", () => {
         yolo: true,
       }),
     ).toEqual([
+      "exec",
+      "--skip-git-repo-check",
       "--model",
       "gpt-5",
       "--sandbox",
@@ -117,6 +119,10 @@ describe("chatTool Integration Tests", () => {
         reasoningSummary: "auto",
       }),
     ).toEqual([
+      "exec",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "workspace-write",
       "-c",
       "model_reasoning_effort=high",
       "-c", 
@@ -130,7 +136,7 @@ describe("chatTool Integration Tests", () => {
         reasoningEffort: "medium",  // Should not appear in args
         reasoningSummary: "none",   // Should not appear in args
       }),
-    ).toEqual(["Test with default reasoning"]);
+    ).toEqual(["exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "Test with default reasoning"]);
   });
 
   it("should validate spawn options structure", () => {

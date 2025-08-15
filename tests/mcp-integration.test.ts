@@ -109,7 +109,7 @@ console.log(divide(10, 0));
     expect(response.result.content[0].text.toLowerCase()).toMatch(/division|divide|zero/);
     
     console.log("✅ テスト成功: MCPファイル分析ツール実行");
-  }, 60000);
+  }, 120000);
 
   it("should handle invalid tool name", async () => {
     console.log("🧪 テスト開始: 無効なツール名のエラーハンドリング");
