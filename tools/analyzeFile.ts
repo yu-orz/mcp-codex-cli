@@ -4,7 +4,7 @@ import path from "node:path";
 import { executeCommand } from "../utils/executeCommand.ts";
 import { CODEX_EXEC_SUBCOMMAND, SKIP_GIT_REPO_CHECK_FLAG } from "../constants.ts";
 
-interface AnalyzeFileArgs {
+export interface AnalyzeFileArgs {
   filePath: string;
   prompt?: string;
   model?: string;

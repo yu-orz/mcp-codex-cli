@@ -6,8 +6,8 @@ import {
   type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { Command } from "commander";
-import { chatTool } from "./tools/chat.ts";
-import { analyzeFileTool } from "./tools/analyzeFile.ts";
+import { chatTool, type ChatArgs } from "./tools/chat.ts";
+import { analyzeFileTool, type AnalyzeFileArgs } from "./tools/analyzeFile.ts";
 
 const server = new Server(
   {
@@ -115,9 +115,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "chat":
-        return await chatTool(args as any);
+        return await chatTool(args as ChatArgs);
       case "analyzeFile":
-        return await analyzeFileTool(args as any);
+        return await analyzeFileTool(args as AnalyzeFileArgs);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }

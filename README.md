@@ -47,7 +47,7 @@ bun install
 bun run build
 
 # ビルド後、Claude MCPに追加
-claude mcp add -s project mcp-codex-cli -- bun run /path/to/mcp-codex-cli/dist/index.js
+claude mcp add -s project mcp-codex-cli -- bun run $(pwd)/dist/index.js
 ```
 
 ## 使用方法
