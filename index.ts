@@ -152,7 +152,9 @@ async function main() {
 }
 
 // Node.jsのESモジュールではimport.meta.mainは利用できないため、直接実行チェックを変更
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// パフォーマンス向上のため起動時に一度だけ計算
+const currentScriptPath = fileURLToPath(import.meta.url);
+if (process.argv[1] && resolve(process.argv[1]) === currentScriptPath) {
   main().catch((error) => {
     console.error("Server startup error:", error);
     process.exit(1);
